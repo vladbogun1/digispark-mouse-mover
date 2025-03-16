@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mouse Movement Logger (Neomorphism)</title>
+  <style>
+    /* 
+      Reset body to 100vh, remove default margin/padding, 
+      and set a neomorphic background.
+    */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #ecf0f3; /* typical neomorphic background */
+      font-family: sans-serif;
+      box-sizing: border-box;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    /* 
+      Main container to ensure everything
+      is vertically laid out (flex).
+    */
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    h1 {
+      margin: 20px 0 10px;
+      color: #333;
+    }
+
+    /* 
+      Neomorphic card style for the mouse zone:
+      A "soft" 3D effect using shadows.
+      Default color is green with 0.3 opacity.
+    */
+    #mouseZone {
+      width: 80%;
+      max-width: 900px;
+      height: 300px;
+      margin-bottom: 20px;
+      background-color: rgba(0, 255, 0, 0.3);
+      border-radius: 12px;
+      box-shadow:
+        inset 5px 5px 10px #babec2,
+        inset -5px -5px 10px #ffffff;
+      position: relative;
+    }
+
+    /* 
+      Wrapper for the table to allow scrolling
+      if the logs get large.
+    */
+    .table-container {
+      width: 80%;
+      max-width: 900px;
+      max-height: 400px; /* you can adjust if desired */
+      overflow-y: auto;
+      border-radius: 12px;
+      box-shadow:
+        5px 5px 10px #babec2,
+        -5px -5px 10px #ffffff;
+      background: #ecf0f3;
+      padding: 10px;
+    }
+
+    /* Style the table for clarity */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    th {
+      background: #ddd;
+      position: sticky; 
+      top: 0; /* So the header stays visible when scrolling */
+      z-index: 1;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Mouse Movement Logger</h1>
+  <div id="mouseZone"></div>
+
+  <div class="table-container">
+    <table id="logTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Time</th>
+          <th>X</th>
+          <th>Y</th>
+          <th>Time Between (s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be inserted here by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const mouseZone = document.getElementById('mouseZone');
+    const logTableBody = document.querySelector('#logTable tbody');
+
+    let lastMoveTime = null;
+    let movementCount = 0;
+    let moveTimer = null;
+
+    // How long to wait (in ms) with no movement before turning green again
+    const inactiveTime = 200;
+
+    mouseZone.addEventListener('mousemove', (e) => {
+      // Turn the zone red (semi-transparent) whenever the mouse moves
+      mouseZone.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+
+      // Clear any previously set timer to turn it green
+      if (moveTimer) {
+        clearTimeout(moveTimer);
+      }
+
+      // Schedule zone color to turn green again after a short wait
+      moveTimer = setTimeout(() => {
+        mouseZone.style.backgroundColor = 'rgba(0, 255, 0, 0.3)';
+      }, inactiveTime);
+
+      movementCount++;
+
+      // Current timestamp
+      const currentTime = Date.now();
+
+      // Calculate time difference from previous move (in ms)
+      let timeBetween = 0;
+      if (lastMoveTime !== null) {
+        timeBetween = currentTime - lastMoveTime;
+      }
+      lastMoveTime = currentTime;
+
+      // Convert to seconds with 2 decimals, 
+      // and replace decimal point with a comma
+      const timeBetweenSeconds = (timeBetween / 1000).toFixed(2).replace('.', ',');
+
+      // Coordinates relative to the box
+      const x = e.offsetX;
+      const y = e.offsetY;
+
+      // Create a new row in the table
+      const row = document.createElement('tr');
+
+      // Fill cells
+      const colCount = document.createElement('td');
+      colCount.textContent = movementCount;
+
+      const colTime = document.createElement('td');
+      colTime.textContent = new Date(currentTime).toLocaleTimeString();
+
+      const colX = document.createElement('td');
+      colX.textContent = x;
+
+      const colY = document.createElement('td');
+      colY.textContent = y;
+
+      const colDiff = document.createElement('td');
+      colDiff.textContent = timeBetweenSeconds;
+
+      // Append cells to row
+      row.appendChild(colCount);
+      row.appendChild(colTime);
+      row.appendChild(colX);
+      row.appendChild(colY);
+      row.appendChild(colDiff);
+
+      // Insert row at the TOP of the table body (latest first)
+      if (logTableBody.firstChild) {
+        logTableBody.insertBefore(row, logTableBody.firstChild);
+      } else {
+        logTableBody.appendChild(row);
+      }
+    });
+  </script>
+</body>
+</html>
