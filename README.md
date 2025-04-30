@@ -1,7 +1,3 @@
-Below is a sample **README.md** file that details how to set up and use both the **HTML-based Mouse Movement Logger** and the **DigiSpark Mouse Mover**. You can adapt it to your needs. The sections include an overview, setup instructions, usage, and even a placeholder for a screenshot of the running HTML file.
-
----
-
 # Mouse Movement Logger & DigiSpark Mouse Mover
 
 ## Overview
