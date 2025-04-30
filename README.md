@@ -61,9 +61,9 @@ Below is a short description of how these two projects work and how to set them 
 You can scroll within the table container if the logs become extensive.
 
 ### Example Screenshot
-```md
+
 ![Screenshot of the Mouse Movement Logger](img/example.jpg)
-```
+
 
 ---
 
